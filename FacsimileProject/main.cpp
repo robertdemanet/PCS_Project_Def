@@ -12,7 +12,7 @@ using namespace GeometryLibrary;
 
 int main()
 {
-    string NameFile= "DFN/FR50_data.txt";
+    string NameFile= "DFN/FR10_data.txt";
     vector<Fracture> fractures;
     fractures=readDFN(NameFile);
     vector<Trace> Traces;
@@ -22,8 +22,13 @@ int main()
     vector<vector<Support>> FractureTraces = writeResult(outputFileName,Traces,num);
     string outputFileName2 = "TracesForFracture.txt";
     bool TracesForFracture = writeTracesForFracture(outputFileName2, FractureTraces);
+<<<<<<< HEAD
 
 
+=======
+    //PolygonalMesh mesh;
+   // mesh=createMesh(fractures,mesh,FractureTraces);
+>>>>>>> a9380b2c4913b4f1ab58b4bcdc6952cba8dd58ce
     return 0;
 }
 
