@@ -22,6 +22,8 @@ int main()
     vector<vector<Support>> FractureTraces = writeResult(outputFileName,Traces,num);
     string outputFileName2 = "TracesForFracture.txt";
     bool TracesForFracture = writeTracesForFracture(outputFileName2, FractureTraces);
+
+
     return 0;
 }
 

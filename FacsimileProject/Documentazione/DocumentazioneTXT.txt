@@ -1,0 +1,94 @@
+@startuml
+skinparam backgroundColor #CCCCCC
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+    ArrowColor #000000
+}
+
+package "GeometryLibrary" {
+class Fracture {
+    + id: int
+    + numVertices: int
+    + vertices: MatrixXd
+    .. Method to get fractures: ..
+    + readDFN(filename: string): vector<Fracture>
+    .. Fractures are used in: ..
+    + computeTraces(fractures: vector<Fracture>): vector<Trace>
+    + TraceVertexes(Point1: Vector3d, Point2: Vector3d, fracture1: Fracture): vector<Vector3d>
+    + computeCentroid(fracture: Fracture): Vector3d
+    + testCircumference(fracture1: Fracture, fracture2: Fracture): bool
+    + createMesh(fractures: vector<Fracture>, mesh: PolygonalMesh, Traces: vector<vector<Support>>): PolygonalMesh
+    .. TESTs: ..
+    readDFNTest
+    TestComputeCentroid
+    TestCircumference
+    TestComputeTraces
+    TestWriteResult
+}
+
+class Trace {
+    + id: int
+    + Fracture1ID: int
+    + Fracture2ID: int
+    + firstPoint: Vector3d
+    + finalPoint: Vector3d
+    + vertex_Inters1: vector<Vector3d>
+    + vertex_Inters2: vector<Vector3d>
+    + firstEdgeID: int
+    + finalEdgeID: int
+    .. Method to get traces: ..
+    + computeTraces(fractures: vector<Fracture>): vector<Trace>
+    .. Traces are used in: ..
+    + TraceVertexes(Point1: Vector3d, Point2: Vector3d, fracture1: Fracture): vector<Vector3d>
+    + writeResult(outFilePath: string, Traces: vector<Trace>)
+    .. TESTs: ..
+    TestComputeTraces
+}
+
+class Support {
+    + idT: int
+    + Tips: bool
+    + length: double
+    + firstPoint: Vector3d
+    + finalPoint: Vector3d
+    .. Method to get supports: ..
+    + writeResult(outFilePath: string, Traces: vector<Trace>): vector<vector<Support>>
+    .. Supports are used in: ..
+    + compareAlphas(alpha1: double, alpha2: double, alpha3: double, alpha4: double): vector<double>
+    + compareLength(Support1: Support, Support2: Support): bool
+    + writeTracesForFracture(outputFilePath: string, FractureTraces: vector<vector<Support>>): bool
+    + createMesh(fractures: vector<Fracture>, mesh: PolygonalMesh, Traces: vector<vector<Support>>): PolygonalMesh
+    .. TESTs: ..
+    TestWriteResult
+}
+
+class PolygonalMesh {
+    + Cell0DId: vector<unsigned int>
+    + Cell0DCoordinates: vector<Vector3d>
+    + Cell1DId: vector<int> 
+    + Cell1DVertices: Vector2i
+    + vecCell2D: vector<Cell2D>
+    .. To get the polygonal mesh: ..
+    +createMesh(fractures: vector<Fracture>, mesh: PolygonalMesh, Traces: vector<vector<Support>>): PolygonalMesh
+}
+note top : PolygonalMesh is not used in any function \n because it is created and then \n immediately edited.
+
+class Cell2D {
++ numIDvertices: int
++ numIDedges: int
++ IDs_vertices: vector<unsigned int> 
++ Ids_edges: vector<unsigned int>
++ status: bool
++ status = true
+}
+note left : Cell2Ds are not used in any function, \n as the PolygonalMesh. They are simply \n filled with informations.
+
+}
+
+Fracture "(2,2)" ---> "(0,N)" Trace: The set of traces depends \n on the set of fractures.
+Trace "(1,1)" --> "(1,1)" Support: Trace and Support represent \n the same concept of trace.
+Fracture "(1,N)" --> "(1,1)" PolygonalMesh:A vector of fractures \n is provided to createMesh.
+Support "(1,N)" ---> "(1,1)" PolygonalMesh:A vector associating supports to \n fractures is provided to createMesh.
+PolygonalMesh "(1,1)" ---> "(1,N)" Cell2D: Cell2Ds are defined and filled \n during createMesh.
+@enduml
