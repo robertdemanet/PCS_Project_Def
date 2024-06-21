@@ -154,7 +154,7 @@ vector<Vector3d> TraceVertexes(Vector3d& Point1,
                                Fracture& fracture1)
 {
 
-    const double tol= 1e-10;
+    const double tol= 1e-9;
     vector<Vector3d> vertex_Inters; // nelle prime due posizioni ho i punti di intersezione che trovo con la prima frattura
                                     // nelle altre due ho quelli che trovo con la frattura 2
 
@@ -225,9 +225,9 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
     }
 
     const string c="; ";
-    file<<"# Number of Traces"<<endl;
+    file<<"#Number of Traces: "<<endl;
     file<<Traces.size()<<endl;
-    file<<"#  TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2"<<endl;
+    file<<"#TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2"<<endl;
 
     for(size_t i = 0; i < Traces.size(); ++i)
     {
