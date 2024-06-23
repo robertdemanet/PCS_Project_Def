@@ -49,7 +49,7 @@ vector<Trace> computeTraces (vector<struct Fracture>& fractures)
 
             double c=tangent.dot(tangent);
 
-            if (A.determinant() != 0 && c!=0)// si può sostituire con il calcolo di un prodotto vettoriale,vedere appunti Vicini
+            if (A.determinant() != 0 && c!=0)
             {
                 Vector3d b;
                 double d1 = fractures[i].vertices.col(0).dot(norm1);
@@ -80,14 +80,14 @@ vector<Trace> computeTraces (vector<struct Fracture>& fractures)
                     alphaC= (vertex_Inters2[0][0]-intersection_point[0])/tangent[0];
                     alphaD= (vertex_Inters2[1][0]-intersection_point[0])/tangent[0];
                 }
-                else if (tangent[1]!=0)
+                else if (tangent[1] != 0)
                 {
                     alphaA= (vertex_Inters1[0][1]-intersection_point[1])/tangent[1];
                     alphaB= (vertex_Inters1[1][1]-intersection_point[1])/tangent[1];
                     alphaC= (vertex_Inters2[0][1]-intersection_point[1])/tangent[1];
                     alphaD= (vertex_Inters2[1][1]-intersection_point[1])/tangent[1];
                 }
-                else if (tangent[2]!=0)
+                else if (tangent[2] != 0)
                 {
                     alphaA= (vertex_Inters1[0][2]-intersection_point[2])/tangent[2];
                     alphaB= (vertex_Inters1[1][2]-intersection_point[2])/tangent[2];
@@ -164,7 +164,7 @@ vector<Vector3d> TraceVertexes(Vector3d& Point1,
         A.resize(3,2);
         Vector3d b = fracture1.vertices.col(i) - Point1;
 
-        Vector3d d = fracture1.vertices.col((i+1) % fracture1.numVertices) - fracture1.vertices.col(i);
+        Vector3d d = fracture1.vertices.col((i+1) % fracture1.numVertices) - fracture1.vertices.col(i); //  (i + 1) % fracture1.numVertices calcola l'indice del vertice successivo in modo ciclico.
 
         Vector3d t= Point2 - Point1;
         A<< t,d;
@@ -231,8 +231,6 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
 
     for(size_t i = 0; i < Traces.size(); ++i)
     {
-        //file << Traces[i].id << c << Traces[i].Fracture1ID << c << Traces[i].Fracture2ID << c;
-
         for(int k=0;k<3;++k)
         {
             file << Traces[i].firstPoint[k] << c;
@@ -249,7 +247,6 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
                    pow(Traces[i].finalPoint[2]-Traces[i].firstPoint[2],2);
         //con questa condizione verifico se i vertici della traccia appartengono entrambi alla frattura1
 
-        //Qui il controllo sarebbe da fare con la tolleranza
         if(Traces[i].vertex_Inters1.size() == 2){
             if( ((Traces[i].firstPoint.isApprox(Traces[i].vertex_Inters1[0])) || (Traces[i].firstPoint.isApprox(Traces[i].vertex_Inters1[1]))) &&
                 ((Traces[i].finalPoint.isApprox(Traces[i].vertex_Inters1[0])) || (Traces[i].finalPoint.isApprox(Traces[i].vertex_Inters1[1])))  )
@@ -268,7 +265,6 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
 
         Return[Traces[i].Fracture1ID].push_back(S);
 
-        //Qui il controllo sarebbe da fare con la tolleranza
         if(Traces[i].vertex_Inters2.size()==2){
             if( ((Traces[i].firstPoint.isApprox(Traces[i].vertex_Inters2[0])) || (Traces[i].firstPoint.isApprox(Traces[i].vertex_Inters2[1]))) &&
                 ((Traces[i].finalPoint.isApprox(Traces[i].vertex_Inters2[0])) || (Traces[i].finalPoint.isApprox(Traces[i].vertex_Inters2[1])))  )
@@ -287,7 +283,7 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
     file.close();
 
     //ordino i vettori per lunghezza in maniera decrescente e separatamente per passante e non passante
-    for(auto& vec:Return)
+    for(auto& vec:Return) // auto& deduce automaticamente il tipo degli elementi in Return e vec è una referenza a ciascun elemento.
     {
         vector<struct Support> trueSupports;
         vector<struct Support> falseSupports;
@@ -304,6 +300,8 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
 
         }
 
+        // vec è una variabile di ciclo che rappresenta un riferimento a ciascun vector<Support> contenuto in Return,
+        // e viene utilizzata per riorganizzare gli elementi di questi vettori in base a specifiche condizioni e criteri di ordinamento.
         sort(trueSupports.begin(),trueSupports.end(),compareLenght);
         sort(falseSupports.begin(),falseSupports.end(),compareLenght);
         vec.clear();
@@ -538,8 +536,9 @@ PolygonalMesh createMesh(vector<Fracture>& fractures,PolygonalMesh& mesh,vector<
                 Vector3d Vertex2;
 
 
+
                 if(Traces[fractures[i].id][k].finalPoint[0] == Traces[fractures[i].id][k].firstPoint[0] &&
-                   Traces[fractures[i].id][k].finalPoint[1] < Traces[fractures[i].id][k].firstPoint[1] )
+                   Traces[fractures[i].id][k].finalPoint[1] < Traces[fractures[i].id][k].firstPoint[1] )  // il punto con la coordinata y più bassa (quando le coordinate x sono uguali) viene assegnato a Vertex1
                 {
                     Vertex1=Traces[fractures[i].id][k].finalPoint;
                     Vertex2=Traces[fractures[i].id][k].firstPoint;
@@ -574,6 +573,8 @@ PolygonalMesh createMesh(vector<Fracture>& fractures,PolygonalMesh& mesh,vector<
                             Vector3d AP2 = Vertex2-Coordinate1;
                             Vector3d t = AB.cross(AP);
                             Vector3d t2 = AB.cross(AP2);
+                            // Il prodotto vettoriale di due vettori sarà nullo (un vettore di tutti zeri)
+                            // se e solo se i due vettori sono paralleli, cioè se sono collineari.
                             if(abs(t[0]) < tol && abs(t[1]) < tol && abs(t[2]) < tol)
                             {
                                 index1 = z;
@@ -702,14 +703,19 @@ PolygonalMesh createMesh(vector<Fracture>& fractures,PolygonalMesh& mesh,vector<
                     }
 
                     auto initV1 =find(mesh.vecCell2D[h].IDs_vertices.begin(),mesh.vecCell2D[h].IDs_vertices.end(),id_Vertex1);
+                    // find è utilizzata per cercare il primo elemento in un intervallo che sia uguale a un valore specificato
+                    // auto permette al compilatore di dedurre automaticamente il tipo della variabile initV1 in base al tipo di ritorno di find.
                     size_t index=distance(mesh.vecCell2D[h].IDs_vertices.begin(),initV1);
 
+                    // itera attraverso i vertici di mesh.vecCell2D[h].IDs_vertices finché non trova id_Vertex2.
                     while(mesh.vecCell2D[h].IDs_vertices[index % mesh.vecCell2D[h].IDs_vertices.size()]!=id_Vertex2)
                     {
                         firstCell2D.IDs_vertices.push_back(mesh.vecCell2D[h].IDs_vertices[index % mesh.vecCell2D[h].IDs_vertices.size()]);
                         firstCell2D.IDs_edges.push_back(index % mesh.vecCell2D[h].IDs_vertices.size());
                         index = index + 1;
                     }
+                    // Dopo che il primo ciclo si è fermato su id_Vertex2, il secondo ciclo continua dal punto in cui
+                    // si è fermato il primo ciclo e itera fino a trovare id_Vertex1
                     while(mesh.vecCell2D[h].IDs_vertices[index % mesh.vecCell2D[h].IDs_vertices.size()]!=id_Vertex1)
                     {
                         secondCell2D.IDs_vertices.push_back(mesh.vecCell2D[h].IDs_vertices[index % mesh.vecCell2D[h].IDs_vertices.size()]);
@@ -737,9 +743,7 @@ PolygonalMesh createMesh(vector<Fracture>& fractures,PolygonalMesh& mesh,vector<
             dim=mesh.vecCell2D.size();
         }
     }
-
     return mesh;
-
 }
 
 }
