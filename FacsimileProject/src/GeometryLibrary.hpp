@@ -27,8 +27,6 @@ struct Trace {
     Vector3d finalPoint;
     vector<Vector3d> vertex_Inters1;
     vector<Vector3d> vertex_Inters2;
-    int firstEdgeID;
-    int finalEdgeID;
 };
 
 struct Support{

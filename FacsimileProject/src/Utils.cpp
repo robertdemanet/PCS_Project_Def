@@ -54,6 +54,8 @@ vector<Trace> computeTraces (vector<struct Fracture>& fractures)
                 Vector3d b;
                 double d1 = fractures[i].vertices.col(0).dot(norm1);
                 double d2 = fractures[j].vertices.col(0).dot(norm2);
+                // d1 rappresenta la proiezione del primo vertice della frattura i lungo la normale norm1,
+                // mentre d2 rappresenta la proiezione del primo vertice della frattura j lungo la normale norm2.
                 b << d1, d2, 0;
 
                 // Risolvo il sistema lineare:
@@ -287,7 +289,7 @@ vector<vector<Support>> writeResult(const string& outputFilePath,
     {
         vector<struct Support> trueSupports;
         vector<struct Support> falseSupports;
-        for(auto& support:vec)
+        for(auto& support:vec)  // Itera su ogni Support all'interno del vector<Support> corrente (vec).
         {
             if(support.Tips)
             {
